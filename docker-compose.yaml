@@ -2,14 +2,21 @@ version: '3'
 services:
   app:
     image: devplayer0/stonkmaster
+    # !!! Delete the line below in "production"
     build: .
     environment:
+      # Alpha Vantage API key, get one from https://www.alphavantage.co/support/
       - API_KEY=blahblahblah
+      # The code for the stonk you want to check
       - STOCK=GOOGL
+      # How often (in seconds) to check the stonk
       - INTERVAL=300
+      # Which data interval to check (see https://www.alphavantage.co/documentation/ for possible values)
       - DATA_INTERVAL=15min
+      # Connection details for your MQTT broker
       - MQTT_HOST=my.mqtt.broker
       - MQTT_PORT=1338
       - MQTT_USERNAME=somedude
       - MQTT_PASSWORD=hunter2
+      # MQTT topic (as configured in Sonoff control panel)
       - SONOFF_TOPIC=stonkmaster
