@@ -1,0 +1,15 @@
+version: '3'
+services:
+  app:
+    image: devplayer0/stonkmaster
+    build: .
+    environment:
+      - API_KEY=blahblahblah
+      - STOCK=GOOGL
+      - INTERVAL=300
+      - DATA_INTERVAL=15min
+      - MQTT_HOST=my.mqtt.broker
+      - MQTT_PORT=1338
+      - MQTT_USERNAME=somedude
+      - MQTT_PASSWORD=hunter2
+      - SONOFF_TOPIC=stonkmaster

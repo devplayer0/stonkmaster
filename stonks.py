@@ -1,14 +1,16 @@
 #!/usr/bin/env python
+import sys
 import os
+import time
 
 from alpha_vantage.timeseries import TimeSeries
 import paho.mqtt.publish as publish
 
 LAST_FILE = '/tmp/last.txt'
 
-def main():
+def update():
     ts = TimeSeries(key=os.environ['API_KEY'], output_format='csv')
-    data, meta = ts.get_intraday(os.environ.get('STOCK', 'GOOGL'), interval=os.environ.get('INTERVAL', '15min'))
+    data, meta = ts.get_intraday(os.environ.get('STOCK', 'GOOGL'), interval=os.environ.get('DATA_INTERVAL', '15min'))
 
     # get csv indexes
     header = next(data)
@@ -21,6 +23,7 @@ def main():
         with open(LAST_FILE) as f:
             # is there actually new data?
             if f.read().strip() == recent[i_ts]:
+                print(f'no new data')
                 return
 
     # get the difference between the newest data and the previous
@@ -38,9 +41,19 @@ def main():
     state = 'ON' if change > 0 else 'OFF'
     auth = {'username': os.environ['MQTT_USERNAME'], 'password': os.environ['MQTT_PASSWORD']}
 
-    print(f'publishing to topic "{topic}" to turn StonkMaster {state}"')
+    print(f'publishing to topic "{topic}" to turn StonkMaster {state}')
     publish.single(topic, state, hostname=os.environ['MQTT_HOST'], port=int(os.environ.get('MQTT_PORT', 1883)),
         auth=auth)
+
+def main():
+    if len(sys.argv) == 1 or sys.argv[1] != 'daemon':
+        update()
+        return
+
+    interval = float(os.environ.get('INTERVAL', 300))
+    while True:
+        update()
+        time.sleep(interval)
 
 if __name__ == '__main__':
     main()
