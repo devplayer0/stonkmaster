@@ -14,6 +14,12 @@ def update():
 
     # get csv indexes
     header = next(data)
+    if 'close' not in header:
+        # TODO: why does this happen?
+        time.sleep(5)
+        update()
+        return
+
     i_close = header.index('close')
     i_ts = header.index('timestamp')
 
