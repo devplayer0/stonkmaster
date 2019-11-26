@@ -1,1 +1,2 @@
 alpha_vantage==2.1.2
+paho-mqtt==1.5.0

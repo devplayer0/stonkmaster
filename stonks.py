@@ -2,6 +2,7 @@
 import os
 
 from alpha_vantage.timeseries import TimeSeries
+import paho.mqtt.publish as publish
 
 LAST_FILE = '/tmp/last.txt'
 
@@ -29,6 +30,17 @@ def main():
     with open(LAST_FILE, 'w') as f:
         # save the most recent data's timestamp
         print(recent[i_ts], file=f)
+
+    if 'MQTT_HOST' not in os.environ:
+        return
+
+    topic = f'cmnd/{os.environ.get("SONOFF_TOPIC", "stonkmaster")}/Power'
+    state = 'ON' if change > 0 else 'OFF'
+    auth = {'username': os.environ['MQTT_USERNAME'], 'password': os.environ['MQTT_PASSWORD']}
+
+    print(f'publishing to topic "{topic}" to turn StonkMaster {state}"')
+    publish.single(topic, state, hostname=os.environ['MQTT_HOST'], port=int(os.environ.get('MQTT_PORT', 1883)),
+        auth=auth)
 
 if __name__ == '__main__':
     main()
